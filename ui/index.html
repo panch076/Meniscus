@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meniscus</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="ambient" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="filters"></defs></svg>
+
+<header class="titlebar" data-tauri-drag-region>
+  <div class="brand" data-tauri-drag-region><span class="drop"></span>Meniscus</div>
+  <div class="device-pill" id="devicePill"><span class="dot"></span><span id="deviceText">Searching…</span></div>
+  <div class="window-buttons">
+    <button id="winMin" title="Minimize" aria-label="Minimize">&#xE921;</button>
+    <button id="winMax" title="Maximize" aria-label="Maximize">&#xE922;</button>
+    <button id="winClose" class="close" title="Close" aria-label="Close">&#xE8BB;</button>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="glass nav" id="nav">
+    <span class="nav-lens" id="navLens"></span>
+    <button data-page="studio" class="active"><b>Studio</b><small>Design the screen</small></button>
+    <button data-page="profiles"><b>Profiles</b><small>Save &amp; switch</small></button>
+    <button data-page="automation"><b>Automation</b><small>Rules &amp; alerts</small></button>
+    <button data-page="sensors"><b>Sensors</b><small>Live readings</small></button>
+    <button data-page="system"><b>System</b><small>Device &amp; startup</small></button>
+    <div class="nav-foot" id="navFoot"></div>
+  </nav>
+
+  <main class="pages">
+    <div class="notice glass" id="takeover" hidden>
+      <div><b>TRCC is holding the screen.</b> <span>Only one app can drive it at a time.</span></div>
+      <label class="check"><input type="checkbox" id="takeoverAuto"> Also stop TRCC starting with Windows</label>
+      <button class="primary" id="takeoverBtn">Take over</button>
+    </div>
+
+    <section class="page studio active" id="page-studio">
+      <div class="stage glass">
+        <div class="stage-head">
+          <input class="title-input" id="profileName" aria-label="Profile name" spellcheck="false">
+          <span class="muted" id="stageMeta"></span>
+        </div>
+        <div class="screen-wrap" id="screenWrap">
+          <div class="screen" id="screen">
+            <canvas id="preview"></canvas>
+            <div class="handles" id="handles"></div>
+          </div>
+        </div>
+        <div class="stage-controls">
+          <label class="mini">Brightness<input type="range" id="brightness" min="0" max="100"><output id="brightnessOut"></output></label>
+          <div class="segmented" id="rotation" role="group" aria-label="Rotation">
+            <button data-v="0">0°</button><button data-v="90">90°</button><button data-v="180">180°</button><button data-v="270">270°</button>
+          </div>
+          <label class="check"><input type="checkbox" id="flip"> Mirror</label>
+        </div>
+      </div>
+
+      <aside class="inspector">
+        <div class="glass card">
+          <h3>Background</h3>
+          <div class="chips" id="bgKinds"></div>
+          <div id="bgFields" class="fields"></div>
+        </div>
+        <div class="glass card grow">
+          <div class="row-between">
+            <h3>Widgets</h3>
+            <div class="add-menu">
+              <select id="addWidget" aria-label="Add widget"></select>
+            </div>
+          </div>
+          <ul class="widget-list" id="widgetList"></ul>
+          <div id="widgetFields" class="fields"></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="page" id="page-profiles">
+      <div class="page-head">
+        <div><h2>Profiles</h2><p class="muted">Saved automatically and restored whenever the app starts.</p></div>
+        <div class="row">
+          <button id="profileImport">Import…</button>
+          <button class="primary" id="profileNew">New profile</button>
+        </div>
+      </div>
+      <div class="profile-grid" id="profileGrid"></div>
+      <h3 class="section">Start from a template</h3>
+      <div class="template-grid" id="templateGrid"></div>
+    </section>
+
+    <section class="page" id="page-automation">
+      <div class="page-head"><div><h2>Automation</h2><p class="muted">Let the screen change itself. App rules beat schedules, and schedules beat the carousel.</p></div></div>
+      <div class="columns">
+        <div class="glass card">
+          <div class="row-between"><h3>Rules</h3>
+            <div class="row"><button id="ruleApp">Add app rule</button><button id="ruleTime">Add schedule</button></div></div>
+          <div id="ruleList" class="rule-list"></div>
+          <h3 class="section">Carousel</h3>
+          <label class="check"><input type="checkbox" id="carousel"> Cycle through profiles</label>
+          <label class="field">Seconds per profile<input type="number" id="carouselSeconds" min="3" max="3600"></label>
+          <div id="carouselIds" class="chips"></div>
+        </div>
+        <div class="stack">
+          <div class="glass card">
+            <h3>Temperature alert</h3>
+            <label class="check"><input type="checkbox" id="alertEnabled"> Flash a warning on the screen</label>
+            <label class="field">Sensor<select id="alertSensor"></select></label>
+            <label class="field">Trigger at or above<input type="number" id="alertThreshold"></label>
+            <label class="field">Message<input type="text" id="alertText"></label>
+          </div>
+          <div class="glass card">
+            <h3>Night &amp; idle</h3>
+            <label class="check"><input type="checkbox" id="sleepEnabled"> Quiet hours</label>
+            <div class="row">
+              <label class="field">From<input type="time" id="sleepFrom"></label>
+              <label class="field">To<input type="time" id="sleepTo"></label>
+            </div>
+            <label class="field">During quiet hours<select id="sleepAction"><option value="dim">Dim the screen</option><option value="off">Show a black screen</option></select></label>
+            <label class="field">Dim to (%)<input type="number" id="sleepDim" min="0" max="100"></label>
+            <label class="field">Black screen after idle (minutes, 0 = never)<input type="number" id="idleOff" min="0" max="600"></label>
+          </div>
+          <div class="glass card">
+            <h3>Weather</h3>
+            <p class="muted small">Sends the coordinates below to open-meteo.com every 15 minutes, only while enabled and a widget uses a weather token.</p>
+            <label class="check"><input type="checkbox" id="weatherEnabled"> Enable weather</label>
+            <div class="row">
+              <label class="field">Latitude<input type="number" id="weatherLat" step="0.01"></label>
+              <label class="field">Longitude<input type="number" id="weatherLon" step="0.01"></label>
+            </div>
+            <label class="check"><input type="checkbox" id="weatherF"> Fahrenheit</label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="page-sensors">
+      <div class="page-head">
+        <div><h2>Sensors</h2><p class="muted" id="sensorSummary"></p></div>
+        <input type="search" id="sensorSearch" placeholder="Filter sensors" spellcheck="false">
+      </div>
+      <div class="notice glass" id="sensorHint" hidden>
+        <div><b>No temperature source found.</b> <span>Run MSI Afterburner, or HWiNFO with Shared Memory Support on. Windows has no built-in way to read CPU temperature.</span></div>
+      </div>
+      <div class="sensor-groups" id="sensorGroups"></div>
+    </section>
+
+    <section class="page" id="page-system">
+      <div class="page-head"><div><h2>System</h2><p class="muted">The screen, this app and how they start.</p></div></div>
+      <div class="columns">
+        <div class="stack">
+          <div class="glass card"><h3>Screen</h3><dl class="facts" id="deviceFacts"></dl></div>
+          <div class="glass card">
+            <h3>Output</h3>
+            <label class="field">Frame rate limit<select id="fps"><option>10</option><option>15</option><option>20</option><option>24</option><option>30</option><option>45</option><option>60</option></select></label>
+            <label class="field">Image quality<input type="range" id="quality" min="50" max="100"></label>
+            <label class="check"><input type="checkbox" id="sharpText"> Full colour detail</label>
+            <p class="muted small">Applies to the current profile. Keep both at maximum for the cleanest text. Lower quality uses less CPU and USB bandwidth.</p>
+          </div>
+        </div>
+        <div class="stack">
+          <div class="glass card"><h3>Performance</h3><dl class="facts" id="perfFacts"></dl>
+            <p class="muted small">Closing the window ends its WebView2 processes. Only the engine stays running.</p></div>
+          <div class="glass card">
+            <h3>Startup</h3>
+            <label class="check"><input type="checkbox" id="autostart"> Start Meniscus with Windows</label>
+            <label class="check"><input type="checkbox" id="closeToTray"> Closing the window keeps the screen running in the tray</label>
+            <label class="check"><input type="checkbox" id="startHidden"> Always start in the tray</label>
+          </div>
+          <div class="glass card">
+            <h3>TRCC</h3>
+            <p class="muted small" id="trccState"></p>
+            <div class="row">
+              <button id="trccStop">Stop TRCC &amp; disable its startup</button>
+              <button id="trccRestore">Restore TRCC startup</button>
+            </div>
+          </div>
+          <div class="glass card"><h3>Your data</h3><p class="muted small selectable" id="dataFolder"></p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast glass" id="toast" hidden></div>
+<script src="glass.js"></script>
+<script src="templates.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

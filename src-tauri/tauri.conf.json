@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Meniscus",
+  "version": "1.0.0",
+  "identifier": "dev.meniscus.app",
+  "build": { "frontendDist": "../ui" },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [],
+    "security": {
+      "dangerousDisableAssetCspModification": ["style-src"],
+      "csp": "default-src 'self'; img-src 'self' data: blob: http://lcd.localhost; connect-src 'self' ipc: http://ipc.localhost http://lcd.localhost; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": ["icons/icon.ico", "icons/icon.png"],
+    "windows": { "webviewInstallMode": { "type": "downloadBootstrapper" } }
+  }
+}

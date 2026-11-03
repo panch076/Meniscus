@@ -1,0 +1,66 @@
+[package]
+name = "meniscus"
+version = "1.0.0"
+description = "Liquid-glass LCD control for Thermalright AIO screens"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon", "image-png", "custom-protocol"] }
+tauri-plugin-dialog = "2"
+tauri-plugin-single-instance = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+nusb = "0.2"
+tiny-skia = "0.11"
+fontdue = "0.9"
+jpeg-encoder = { version = "0.7", features = ["simd"] }
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "gif", "webp", "bmp"] }
+fast_image_resize = "6"
+realfft = "3"
+regex = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+ureq = { version = "3", default-features = false, features = ["rustls", "json"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+
+[dependencies.windows]
+version = "0.61"
+features = [
+  "Foundation",
+  "Foundation_Collections",
+  "Media_Control",
+  "Storage_Streams",
+  "Win32_Foundation",
+  "Win32_Graphics_Gdi",
+  "Win32_Media_Audio",
+  "Win32_Media_KernelStreaming",
+  "Win32_Media_MediaFoundation",
+  "Win32_Media_Multimedia",
+  "Win32_NetworkManagement_IpHelper",
+  "Win32_NetworkManagement_Ndis",
+  "Win32_Networking_WinSock",
+  "Win32_Security",
+  "Win32_Storage_FileSystem",
+  "Win32_System_Com",
+  "Win32_System_Com_StructuredStorage",
+  "Win32_System_Memory",
+  "Win32_System_Performance",
+  "Win32_System_ProcessStatus",
+  "Win32_System_Registry",
+  "Win32_System_SystemInformation",
+  "Win32_System_Threading",
+  "Win32_System_Variant",
+  "Win32_System_WinRT",
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_Shell",
+  "Win32_UI_WindowsAndMessaging",
+]
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true
