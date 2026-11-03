@@ -1,5 +1,5 @@
 # Meniscus
-
+# pure, vibecoded, claude-made, slop -- i made it for my use case, so if you need help, [here](claude.ai/new) is the link 
 A fast, liquid-glass replacement for Thermalright's TRCC, for AIO and cooler LCDs on the USB bulk protocol (`87AD:70DB`).
 
 ## Build
